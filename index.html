@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSC Archive</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Encabezado -->
+  <header>
+    <h1>OSC Video Archive</h1>
+    <p>¡El archivo definitivo de BFDI, II, ONE, Animatic Battle y más!</p>
+  </header>
+
+  <!-- Filtros por Show -->
+  <nav class="controls">
+    <button onclick="filterEpisodes('all')">Todos</button>
+    <button onclick="filterEpisodes('BFDI')">BFDI</button>
+    <button onclick="filterEpisodes('II')">Inanimate Insanity</button>
+    <button onclick="filterEpisodes('ONE')">ONE (HFJONE)</button>
+    <button onclick="filterEpisodes('AB')">Animatic Battle</button>
+    <button onclick="filterEpisodes('TNM')">The Nightly Manor</button>
+  </nav>
+
+  <!-- Contenedor dinámico -->
+  <main id="episodes-container" class="grid-container">
+    <!-- JS insertará las tarjetas aquí -->
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
