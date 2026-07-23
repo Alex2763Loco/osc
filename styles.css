@@ -1,20 +1,105 @@
+/* Variables de color para Temas Claro/Oscuro */
+:root {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-color: #ffffff;
+  --text-secondary: #aaaaaa;
+  --accent-color: #00ff66;
+  --btn-bg: #2a2a2a;
+  --btn-hover: #3a3a3a;
+  --input-bg: #1e1e1e;
+  --border-color: #333333;
+}
+
+[data-theme="light"] {
+  --bg-color: #f4f4f9;
+  --card-bg: #ffffff;
+  --text-color: #121212;
+  --text-secondary: #555555;
+  --accent-color: #00b347;
+  --btn-bg: #e0e0e0;
+  --btn-hover: #d0d0d0;
+  --input-bg: #ffffff;
+  --border-color: #cccccc;
+}
+
 /* Estilos generales */
 body {
   margin: 0;
   padding: 0;
-  background-color: #121212;
-  color: #ffffff;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   font-family: Arial, sans-serif;
   text-align: center;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 header {
   padding: 20px 10px;
 }
 
+.header-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 header h1 {
-  color: #00ff66;
-  margin-bottom: 5px;
+  color: var(--accent-color);
+  margin: 0;
+}
+
+header p {
+  color: var(--text-secondary);
+}
+
+/* Botón de cambio de tema */
+.theme-btn {
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.theme-btn:hover {
+  background-color: var(--btn-hover);
+  transform: scale(1.05);
+}
+
+/* Contenedor de controles (Buscador y Filtros) */
+.controls-container {
+  max-width: 900px;
+  margin: 0 auto 30px auto;
+  padding: 0 20px;
+}
+
+/* Barra de búsqueda */
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: 2px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-box input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
 }
 
 /* Botones de filtro superiores */
@@ -23,12 +108,11 @@ header h1 {
   justify-content: center;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 30px;
 }
 
 .filter-btn {
-  background-color: #2a2a2a;
-  color: #fff;
+  background-color: var(--btn-bg);
+  color: var(--text-color);
   border: none;
   padding: 10px 20px;
   border-radius: 20px;
@@ -38,18 +122,18 @@ header h1 {
 }
 
 .filter-btn:hover {
-  background-color: #3a3a3a;
+  background-color: var(--btn-hover);
   transform: scale(1.2) !important;
   box-shadow: 0 4px 15px rgba(0, 255, 102, 0.4);
 }
 
 .filter-btn.active {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: var(--text-color);
+  color: var(--bg-color);
   transform: scale(1.08);
 }
 
-/* Cuadricula de 3 columnas */
+/* Cuadrícula de 3 columnas */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -61,10 +145,10 @@ header h1 {
 
 /* Tarjetas de episodios */
 .card {
-  background-color: #1e1e1e;
+  background-color: var(--card-bg);
   border-radius: 10px;
   padding: 15px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -129,7 +213,7 @@ header h1 {
 
 .no-episodes {
   grid-column: 1 / -1;
-  color: #888;
+  color: var(--text-secondary);
   font-size: 1.1rem;
 }
 
