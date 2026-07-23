@@ -1,41 +1,45 @@
 let allEpisodes = [];
-
-// Lista de IDs de videos con bloqueo de reproductor embebido
 const blockedEmbedIds = ["lcGtU2eYeyU", "YQa2-DY7Y0Q"];
 
-// Sintetizador de sonido cómodo de GUI usando Web Audio API
+// AudioContext global
 let audioCtx = null;
 
+// Inicializa el audio tras cualquier interacción previa del usuario
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+// Sonido "Pop/GUI"
 function playGuiHoverSound() {
   try {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
+    initAudio();
+    if (!audioCtx || audioCtx.state !== 'running') return;
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
-    osc.type = 'sine'; // Onda suave y limpia
-    osc.frequency.setValueAtTime(480, audioCtx.currentTime); 
-    osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.04);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.05);
 
-    gain.gain.setValueAtTime(0.08, audioCtx.currentTime); // Volumen suave para no molestar
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
 
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.04);
+    osc.stop(audioCtx.currentTime + 0.05);
   } catch (e) {
-    // Silencioso en caso de bloqueo por política de autoproductores del navegador
+    console.error(e);
   }
 }
 
-// Función para filtrar episodios y actualizar botones
 function filterEpisodes(show) {
   const filterButtons = document.querySelectorAll('.filter-btn');
 
@@ -55,7 +59,6 @@ function filterEpisodes(show) {
   }
 }
 
-// Función para renderizar las tarjetas
 function renderEpisodes(episodesToRender) {
   const episodesContainer = document.getElementById('episodes-container');
   if (!episodesContainer) return;
@@ -71,7 +74,9 @@ function renderEpisodes(episodesToRender) {
     const card = document.createElement('div');
     card.className = 'card';
 
-    // Manejo de videos bloqueados
+    // Agregar sonido también cuando pasas por encima de CADA tarjeta de video
+    card.addEventListener('mouseenter', playGuiHoverSound);
+
     if (blockedEmbedIds.includes(ep.youtubeId)) {
       card.innerHTML = `
         <h3>${ep.title}</h3>
@@ -83,7 +88,6 @@ function renderEpisodes(episodesToRender) {
         </div>
       `;
     } else {
-      // Reproductor embebido estándar
       card.innerHTML = `
         <h3>${ep.title}</h3>
         <iframe 
@@ -98,33 +102,26 @@ function renderEpisodes(episodesToRender) {
 
     episodesContainer.appendChild(card);
   });
-
-  // Agregar el sonido de gui a los botones rojos de enlace que se acaban de renderizar
-  const ytButtons = document.querySelectorAll('.yt-link-btn');
-  ytButtons.forEach(btn => {
-    btn.addEventListener('mouseenter', playGuiHoverSound);
-  });
 }
 
-// Inicialización de la aplicación
 document.addEventListener('DOMContentLoaded', () => {
+  // Desbloquear audio en el primer clic a la página
+  window.addEventListener('click', initAudio, { once: true });
+
   const filterButtons = document.querySelectorAll('.filter-btn');
 
   filterButtons.forEach(button => {
-    // Sonido al pasar el cursor
     button.addEventListener('mouseenter', playGuiHoverSound);
 
-    // Acción de filtrado al dar click
     button.addEventListener('click', () => {
       const showFilter = button.getAttribute('data-show');
       filterEpisodes(showFilter);
     });
   });
 
-  // Cargar datos JSON
   fetch('episodes.json')
     .then(response => {
-      if (!response.ok) throw new Error("Error al obtener episodes.json");
+      if (!response.ok) throw new Error("Error en episodes.json");
       return response.json();
     })
     .then(episodes => {
