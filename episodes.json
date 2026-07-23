@@ -2,7 +2,8 @@
   {
     "title": "BFDI 1a: Take the Plunge",
     "show": "BFDI",
-    "youtubeId": "YQa2-DY7Y0Q"
+    "youtubeId": "YQa2-DY7Y0Q",
+    "noEmbed": true
   },
   {
     "title": "BFDI 1b: Take the Plunge",
@@ -42,7 +43,7 @@
   {
     "title": "BFDIA 25: She Deserves This",
     "show": "BFDI",
-    "youtubeId": "Zrijg7Cun2KITR7z"
+    "youtubeId": "4vCce4X3wSg"
   },
   {
     "title": "Inanimate Insanity 1: The Crappy Cliff",
@@ -57,27 +58,27 @@
   {
     "title": "ONE 1: Freefall",
     "show": "ONE",
-    "youtubeId": "pu1wFGfpJsVwycV9"
+    "youtubeId": "8Gu0hjkq1Zg"
   },
   {
     "title": "Animatic Battle 1: M Is for Magic",
     "show": "AB",
-    "youtubeId": "QgYrHgxWouy1q5To"
-  },
-  {
-    "title": "The Nightly Manor: Part 1 - Visitors, Invited",
-    "show": "TNM",
-    "youtubeId": "_4h9fDattN60__xi"
+    "youtubeId": "CjbUT7C5VY8"
   },
   {
     "title": "Bean's Show 1: Forget The Secondly",
     "show": "BS",
-    "youtubeId": "m1FtwieT9gmdd02Y"
+    "youtubeId": "5u0R1aE32nI"
+  },
+  {
+    "title": "The Nightly Manor: Part 1 - Visitors, Invited",
+    "show": "TNM",
+    "youtubeId": "T1w9gjxShbo"
   },
   {
     "title": "Object Fool 1: Haha You Thought It Was GGG HAHAHA",
     "show": "OF",
-    "youtubeId": "KC0w4IlliZGA75sE"
+    "youtubeId": "X-sVrwbqIy8"
   },
   {
     "title": "IT'S TIME FOR THE [1:00] - Who's Jason??",
