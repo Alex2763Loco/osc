@@ -1,10 +1,44 @@
 let allEpisodes = [];
 
+// Lista de IDs de videos con bloqueo de reproductor embebido
+const blockedEmbedIds = ["lcGtU2eYeyU", "YQa2-DY7Y0Q"];
+
+// Sintetizador de sonido cómodo de GUI usando Web Audio API
+let audioCtx = null;
+
+function playGuiHoverSound() {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine'; // Onda suave y limpia
+    osc.frequency.setValueAtTime(480, audioCtx.currentTime); 
+    osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.04);
+
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime); // Volumen suave para no molestar
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.04);
+  } catch (e) {
+    // Silencioso en caso de bloqueo por política de autoproductores del navegador
+  }
+}
+
 // Función para filtrar episodios y actualizar botones
 function filterEpisodes(show) {
   const filterButtons = document.querySelectorAll('.filter-btn');
 
-  // Cambiar clases activas en los botones
   filterButtons.forEach(btn => {
     if (btn.getAttribute('data-show') === show) {
       btn.classList.add('active');
@@ -13,7 +47,6 @@ function filterEpisodes(show) {
     }
   });
 
-  // Filtrar el arreglo de episodios
   if (show === 'all') {
     renderEpisodes(allEpisodes);
   } else {
@@ -38,8 +71,8 @@ function renderEpisodes(episodesToRender) {
     const card = document.createElement('div');
     card.className = 'card';
 
-    // Solamente Inanimate Insanity 1 (ID: lcGtU2eYeyU) usa enlace externo por bloqueo
-    if (ep.youtubeId === "lcGtU2eYeyU") {
+    // Manejo de videos bloqueados
+    if (blockedEmbedIds.includes(ep.youtubeId)) {
       card.innerHTML = `
         <h3>${ep.title}</h3>
         <div class="thumb-container">
@@ -50,7 +83,7 @@ function renderEpisodes(episodesToRender) {
         </div>
       `;
     } else {
-      // Todos los demás episodios cargan el reproductor normal
+      // Reproductor embebido estándar
       card.innerHTML = `
         <h3>${ep.title}</h3>
         <iframe 
@@ -65,20 +98,30 @@ function renderEpisodes(episodesToRender) {
 
     episodesContainer.appendChild(card);
   });
+
+  // Agregar el sonido de gui a los botones rojos de enlace que se acaban de renderizar
+  const ytButtons = document.querySelectorAll('.yt-link-btn');
+  ytButtons.forEach(btn => {
+    btn.addEventListener('mouseenter', playGuiHoverSound);
+  });
 }
 
-// Inicialización de eventos y datos al cargar la página
+// Inicialización de la aplicación
 document.addEventListener('DOMContentLoaded', () => {
-  // Asignar los eventos de click a los botones desde el inicio
   const filterButtons = document.querySelectorAll('.filter-btn');
+
   filterButtons.forEach(button => {
+    // Sonido al pasar el cursor
+    button.addEventListener('mouseenter', playGuiHoverSound);
+
+    // Acción de filtrado al dar click
     button.addEventListener('click', () => {
       const showFilter = button.getAttribute('data-show');
       filterEpisodes(showFilter);
     });
   });
 
-  // Cargar el archivo JSON
+  // Cargar datos JSON
   fetch('episodes.json')
     .then(response => {
       if (!response.ok) throw new Error("Error al obtener episodes.json");
