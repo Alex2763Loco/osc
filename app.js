@@ -1,20 +1,28 @@
 let allEpisodes = [];
 
-// Cargar episodios desde el archivo JSON
-fetch('episodes.json')
-  .then(response => response.json())
+// Cargar episodios con ruta relativa './'
+fetch('./episodes.json')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
   .then(data => {
     allEpisodes = data;
     renderEpisodes(allEpisodes);
   })
-  .catch(error => console.error('Error cargando episodios:', error));
+  .catch(error => {
+    console.error('Error cargando episodios:', error);
+    const container = document.getElementById('episodes-container');
+    container.innerHTML = `<p style="color: #ff5252;">Error al cargar el JSON: ${error.message}</p>`;
+  });
 
-// Función para renderizar los videos en la pantalla
 function renderEpisodes(episodes) {
   const container = document.getElementById('episodes-container');
   container.innerHTML = '';
 
-  if (episodes.length === 0) {
+  if (!episodes || episodes.length === 0) {
     container.innerHTML = '<p>No hay episodios en esta categoría aún.</p>';
     return;
   }
@@ -37,7 +45,6 @@ function renderEpisodes(episodes) {
   });
 }
 
-// Función de filtrado por serie
 function filterEpisodes(showCode) {
   if (showCode === 'all') {
     renderEpisodes(allEpisodes);
