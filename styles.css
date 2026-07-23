@@ -37,7 +37,6 @@ header h1 {
   transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s, box-shadow 0.2s;
 }
 
-/* Efecto Hover & Scale en botones */
 .filter-btn:hover {
   background-color: #3a3a3a;
   transform: scale(1.2) !important;
@@ -50,7 +49,7 @@ header h1 {
   transform: scale(1.08);
 }
 
-/* Cuadrícula de 3 columnas */
+/* Cuadricula de 3 columnas */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -72,7 +71,6 @@ header h1 {
   transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
 }
 
-/* Efecto de Agrandado en la Tarjeta al pasar el cursor */
 .card:hover {
   transform: scale(1.06);
   box-shadow: 0 8px 25px rgba(0, 255, 102, 0.25);
@@ -97,7 +95,7 @@ header h1 {
   border: none;
 }
 
-/* Miniaturas con enlace directo para videos bloqueados */
+/* Miniaturas con enlace directo */
 .thumb-container {
   width: 100%;
   position: relative;
@@ -135,7 +133,7 @@ header h1 {
   font-size: 1.1rem;
 }
 
-/* Adaptación responsiva para móviles y tablets */
+/* Adaptación para pantallas pequeñas */
 @media (max-width: 900px) {
   .grid-container {
     grid-template-columns: repeat(2, 1fr);
