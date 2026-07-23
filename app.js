@@ -1,10 +1,10 @@
 let allEpisodes = [];
 
-// Función para filtrar y renderizar
+// Función global para filtrar episodios y actualizar botones
 function filterEpisodes(show) {
   const filterButtons = document.querySelectorAll('.filter-btn');
 
-  // Actualizar estado activo en los botones
+  // Cambiar clases activas en los botones de la interfaz
   filterButtons.forEach(btn => {
     if (btn.getAttribute('data-show') === show) {
       btn.classList.add('active');
@@ -13,7 +13,7 @@ function filterEpisodes(show) {
     }
   });
 
-  // Filtrar episodios
+  // Filtrar el arreglo de episodios
   if (show === 'all') {
     renderEpisodes(allEpisodes);
   } else {
@@ -22,7 +22,7 @@ function filterEpisodes(show) {
   }
 }
 
-// Renderizar las tarjetas en la cuadrícula
+// Función para renderizar las tarjetas en la cuadrícula
 function renderEpisodes(episodesToRender) {
   const episodesContainer = document.getElementById('episodes-container');
   if (!episodesContainer) return;
@@ -38,8 +38,8 @@ function renderEpisodes(episodesToRender) {
     const card = document.createElement('div');
     card.className = 'card';
 
-    // Excepción para videos que bloquean embebido (Inanimate Insanity 1)
-    if (ep.youtubeId === "lcGtU2eYeyU" || (ep.show === "II" && ep.title.includes("Crappy Cliff"))) {
+    // Solamente Inanimate Insanity 1 (ID: lcGtU2eYeyU) usa enlace externo por bloqueo de reproductor
+    if (ep.youtubeId === "lcGtU2eYeyU") {
       card.innerHTML = `
         <h3>${ep.title}</h3>
         <div class="thumb-container">
@@ -50,7 +50,7 @@ function renderEpisodes(episodesToRender) {
         </div>
       `;
     } else {
-      // Reproductor embebido estándar
+      // Todos los demás episodios se cargan en el reproductor de YouTube
       card.innerHTML = `
         <h3>${ep.title}</h3>
         <iframe 
@@ -67,9 +67,9 @@ function renderEpisodes(episodesToRender) {
   });
 }
 
-// Inicialización de la app
+// Inicialización de eventos y datos al cargar el DOM
 document.addEventListener('DOMContentLoaded', () => {
-  // Asignar eventos a los botones desde el inicio
+  // Asignar los eventos de click a los botones
   const filterButtons = document.querySelectorAll('.filter-btn');
   filterButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -78,10 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Cargar datos del JSON
+  // Cargar el archivo JSON
   fetch('episodes.json')
     .then(response => {
-      if (!response.ok) throw new Error("Error en la respuesta de la red");
+      if (!response.ok) throw new Error("Error al obtener episodes.json");
       return response.json();
     })
     .then(episodes => {
