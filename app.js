@@ -1,10 +1,10 @@
 let allEpisodes = [];
-const blockedEmbedIds = ["lcGtU2eYeyU", "YQa2-DY7Y0Q"];
+let currentFilter = 'all';
+let searchQuery = '';
 
-// AudioContext global
+const blockedEmbedIds = ["lcGtU2eYeyU", "YQa2-DY7Y0Q"];
 let audioCtx = null;
 
-// Inicializa el audio tras cualquier interacción previa del usuario
 function initAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -14,7 +14,6 @@ function initAudio() {
   }
 }
 
-// Sonido "Pop/GUI"
 function playGuiHoverSound() {
   try {
     initAudio();
@@ -40,23 +39,20 @@ function playGuiHoverSound() {
   }
 }
 
-function filterEpisodes(show) {
-  const filterButtons = document.querySelectorAll('.filter-btn');
+// Aplica el filtro por categoría y por término de búsqueda
+function applyFilters() {
+  let filtered = allEpisodes;
 
-  filterButtons.forEach(btn => {
-    if (btn.getAttribute('data-show') === show) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
-
-  if (show === 'all') {
-    renderEpisodes(allEpisodes);
-  } else {
-    const filtered = allEpisodes.filter(ep => ep.show === show);
-    renderEpisodes(filtered);
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(ep => ep.show === currentFilter);
   }
+
+  if (searchQuery.trim() !== '') {
+    const query = searchQuery.toLowerCase();
+    filtered = filtered.filter(ep => ep.title.toLowerCase().includes(query));
+  }
+
+  renderEpisodes(filtered);
 }
 
 function renderEpisodes(episodesToRender) {
@@ -66,7 +62,7 @@ function renderEpisodes(episodesToRender) {
   episodesContainer.innerHTML = '';
 
   if (episodesToRender.length === 0) {
-    episodesContainer.innerHTML = '<p class="no-episodes">No hay episodios disponibles para esta categoría.</p>';
+    episodesContainer.innerHTML = '<p class="no-episodes">No se encontraron episodios.</p>';
     return;
   }
 
@@ -74,7 +70,6 @@ function renderEpisodes(episodesToRender) {
     const card = document.createElement('div');
     card.className = 'card';
 
-    // Agregar sonido también cuando pasas por encima de CADA tarjeta de video
     card.addEventListener('mouseenter', playGuiHoverSound);
 
     if (blockedEmbedIds.includes(ep.youtubeId)) {
@@ -105,19 +100,45 @@ function renderEpisodes(episodesToRender) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Desbloquear audio en el primer clic a la página
   window.addEventListener('click', initAudio, { once: true });
 
-  const filterButtons = document.querySelectorAll('.filter-btn');
+  // Evento para el buscador en tiempo real
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      applyFilters();
+    });
+  }
 
+  // Eventos para los botones de filtro
+  const filterButtons = document.querySelectorAll('.filter-btn');
   filterButtons.forEach(button => {
     button.addEventListener('mouseenter', playGuiHoverSound);
 
     button.addEventListener('click', () => {
-      const showFilter = button.getAttribute('data-show');
-      filterEpisodes(showFilter);
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+
+      currentFilter = button.getAttribute('data-show');
+      applyFilters();
     });
   });
+
+  // Cambio de modo claro / oscuro
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.textContent = '☀️ Modo Claro';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeToggle.textContent = '🌙 Modo Oscuro';
+      }
+    });
+  }
 
   fetch('episodes.json')
     .then(response => {
