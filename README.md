@@ -3,7 +3,7 @@ anything but doing my homework.
 
 ¡Bienvenido a **WOTOSC**! El archivo web definitivo para explorar y disfrutar episodios de tus *Object Shows* favoritos sin perder tiempo buscando en YouTube.
 
-> *"It's like a fast server so you don't wait 27.63 hours for clicking a button!"* ⚡
+> *"It's like a fast server so you don't wait 27.63 hours for clicking a button!"* - match ⚡
 
 ---
 
@@ -32,3 +32,7 @@ anything but doing my homework.
 * **JavaScript (ES6+)**
 * **JSON** 
 * **GitHub Pages**
+
+>*lo mejor NO me sobre explotaron!* Gemini
+
+---
