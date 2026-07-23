@@ -81,7 +81,7 @@ header p {
 
 /* Barra de búsqueda */
 .search-box {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .search-box input {
@@ -102,35 +102,41 @@ header p {
   box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
 }
 
-/* Botones de filtro superiores */
+/* Contenedor de los botones de filtro con espacio suficiente */
 .filter-container {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
+  padding: 15px 10px;
+  margin-top: 5px;
 }
 
+/* Ajuste de tamaño y relleno de los botones */
 .filter-btn {
   background-color: var(--btn-bg);
   color: var(--text-color);
   border: none;
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 0.9rem;
   transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s, box-shadow 0.2s;
 }
 
+/* Efecto Hover equilibrado */
 .filter-btn:hover {
   background-color: var(--btn-hover);
-  transform: scale(1.2) !important;
-  box-shadow: 0 4px 15px rgba(0, 255, 102, 0.4);
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 255, 102, 0.3);
 }
 
 .filter-btn.active {
   background-color: var(--text-color);
   color: var(--bg-color);
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .filter-btn.favorites-btn {
