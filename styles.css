@@ -8,81 +8,126 @@
 body {
   background-color: #121212;
   color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
-  text-align: center;
+  min-height: 100vh;
 }
 
 header {
+  text-align: center;
   margin-bottom: 25px;
 }
 
-header h1 {
-  font-size: 2.5rem;
-  color: #00e676;
-  margin-bottom: 8px;
+h1 {
+  font-size: 2.2rem;
+  color: #00ff66;
+  margin-bottom: 5px;
 }
 
-/* Botones de navegación */
-.controls {
+header p {
+  color: #aaaaaa;
+  font-size: 0.95rem;
+}
+
+/* Botones de Filtro */
+.filter-container {
   display: flex;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
   margin-bottom: 30px;
 }
 
-.controls button {
-  background-color: #1f1f1f;
-  color: #fff;
-  border: 2px solid #333;
-  padding: 10px 18px;
+.filter-btn {
+  background-color: #222222;
+  color: #ffffff;
+  border: 1px solid #444444;
+  padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s ease;
 }
 
-.controls button:hover {
-  background-color: #00e676;
-  color: #000;
-  border-color: #00e676;
+.filter-btn:hover {
+  background-color: #333333;
+  border-color: #666666;
 }
 
-/* Grid de videos */
-.grid-container {
+.filter-btn.active {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+/* Grid de Tarjetas */
+.episodes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 1100px;
 }
 
 .card {
   background-color: #1e1e1e;
   border-radius: 12px;
-  overflow: hidden;
-  padding: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .card h3 {
-  font-size: 1rem;
-  margin-bottom: 10px;
-  color: #e0e0e0;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  text-align: center;
+  color: #dddddd;
 }
 
-.video-wrapper {
+/* Estilo para los reproductores de YouTube */
+.card iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: none;
+}
+
+/* Estilo para la miniatura y botón de videos bloqueados (II 1 Original) */
+.thumb-container {
   position: relative;
-  padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
-  height: 0;
+  width: 100%;
+  aspect-ratio: 16 / 9;
   border-radius: 8px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.video-wrapper iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
+.thumb-container img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+
+.yt-link-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 0, 0, 0.9);
+  color: #ffffff;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.85rem;
+  transition: background-color 0.2s ease;
+}
+
+.yt-link-btn:hover {
+  background-color: #cc0000;
 }
