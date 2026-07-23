@@ -1,12 +1,12 @@
 let allEpisodes = [];
 
-// Función global para que los botones con onclick="" no fallen
+// Función para filtrar y renderizar
 function filterEpisodes(show) {
   const filterButtons = document.querySelectorAll('.filter-btn');
-  
-  // Cambiar estilos de botones activos
+
+  // Actualizar estado activo en los botones
   filterButtons.forEach(btn => {
-    if (btn.getAttribute('data-show') === show || (show === 'all' && btn.getAttribute('data-show') === 'todos')) {
+    if (btn.getAttribute('data-show') === show) {
       btn.classList.add('active');
     } else {
       btn.classList.remove('active');
@@ -26,14 +26,19 @@ function filterEpisodes(show) {
 function renderEpisodes(episodesToRender) {
   const episodesContainer = document.getElementById('episodes-container');
   if (!episodesContainer) return;
-  
+
   episodesContainer.innerHTML = '';
+
+  if (episodesToRender.length === 0) {
+    episodesContainer.innerHTML = '<p class="no-episodes">No hay episodios disponibles para esta categoría.</p>';
+    return;
+  }
 
   episodesToRender.forEach(ep => {
     const card = document.createElement('div');
     card.className = 'card';
 
-    // Si es Inanimate Insanity 1 original que bloquea embebido
+    // Excepción para videos que bloquean embebido (Inanimate Insanity 1)
     if (ep.youtubeId === "lcGtU2eYeyU" || (ep.show === "II" && ep.title.includes("Crappy Cliff"))) {
       card.innerHTML = `
         <h3>${ep.title}</h3>
@@ -45,7 +50,7 @@ function renderEpisodes(episodesToRender) {
         </div>
       `;
     } else {
-      // Para todos los demás videos que sí permiten reproductor embebido
+      // Reproductor embebido estándar
       card.innerHTML = `
         <h3>${ep.title}</h3>
         <iframe 
@@ -62,22 +67,26 @@ function renderEpisodes(episodesToRender) {
   });
 }
 
-// Cargar datos al iniciar la página
+// Inicialización de la app
 document.addEventListener('DOMContentLoaded', () => {
+  // Asignar eventos a los botones desde el inicio
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const showFilter = button.getAttribute('data-show');
+      filterEpisodes(showFilter);
+    });
+  });
+
+  // Cargar datos del JSON
   fetch('episodes.json')
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) throw new Error("Error en la respuesta de la red");
+      return response.json();
+    })
     .then(episodes => {
       allEpisodes = episodes;
       renderEpisodes(allEpisodes);
-
-      // Listener para eventListeners de botones si no usan onclick
-      const filterButtons = document.querySelectorAll('.filter-btn');
-      filterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const showFilter = button.getAttribute('data-show');
-          filterEpisodes(showFilter);
-        });
-      });
     })
     .catch(error => console.error('Error al cargar episodes.json:', error));
 });
