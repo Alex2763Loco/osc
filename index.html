@@ -8,20 +8,30 @@
 </head>
 <body>
 
-  <!-- Encabezado -->
+  <!-- Encabezado con Botón de Modo Claro/Oscuro -->
   <header>
-    <h1>OSC Video Archive</h1>
-    <p>¡El archivo definitivo de BFDI, II, ONE, Animatic Battle y más!</p>
+    <div class="header-top">
+      <h1>OSC Video Archive</h1>
+      <button id="theme-toggle" class="theme-btn">☀️ Modo Claro</button>
+    </div>
+    <p>¡El archivo definitivo de BFDI, II, ONE, Animatic Battle, Bean's Show y más!</p>
   </header>
 
-  <!-- Filtros por Show -->
-  <div class="filter-container">
-    <button class="filter-btn active" data-show="all">Todos</button>
-    <button class="filter-btn" data-show="BFDI">BFDI</button>
-    <button class="filter-btn" data-show="II">II</button>
-    <button class="filter-btn" data-show="ONE">ONE</button>
-    <button class="filter-btn" data-show="AB">AB</button>
-    <button class="filter-btn" data-show="TNM">TNM</button>
+  <!-- Contenedor de Búsqueda y Filtros -->
+  <div class="controls-container">
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="🔍 Buscar episodios por título...">
+    </div>
+
+    <div class="filter-container">
+      <button class="filter-btn active" data-show="all">Todos</button>
+      <button class="filter-btn" data-show="BFDI">BFDI</button>
+      <button class="filter-btn" data-show="II">II</button>
+      <button class="filter-btn" data-show="ONE">ONE</button>
+      <button class="filter-btn" data-show="AB">AB</button>
+      <button class="filter-btn" data-show="BS">BS</button>
+      <button class="filter-btn" data-show="TNM">TNM</button>
+    </div>
   </div>
 
   <!-- Contenedor dinámico -->
