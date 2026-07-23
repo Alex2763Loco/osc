@@ -1,10 +1,10 @@
 let allEpisodes = [];
 
-// Función global para filtrar episodios y actualizar botones
+// Función para filtrar episodios y actualizar botones
 function filterEpisodes(show) {
   const filterButtons = document.querySelectorAll('.filter-btn');
 
-  // Cambiar clases activas en los botones de la interfaz
+  // Cambiar clases activas en los botones
   filterButtons.forEach(btn => {
     if (btn.getAttribute('data-show') === show) {
       btn.classList.add('active');
@@ -22,7 +22,7 @@ function filterEpisodes(show) {
   }
 }
 
-// Función para renderizar las tarjetas en la cuadrícula
+// Función para renderizar las tarjetas
 function renderEpisodes(episodesToRender) {
   const episodesContainer = document.getElementById('episodes-container');
   if (!episodesContainer) return;
@@ -38,7 +38,7 @@ function renderEpisodes(episodesToRender) {
     const card = document.createElement('div');
     card.className = 'card';
 
-    // Solamente Inanimate Insanity 1 (ID: lcGtU2eYeyU) usa enlace externo por bloqueo de reproductor
+    // Solamente Inanimate Insanity 1 (ID: lcGtU2eYeyU) usa enlace externo por bloqueo
     if (ep.youtubeId === "lcGtU2eYeyU") {
       card.innerHTML = `
         <h3>${ep.title}</h3>
@@ -50,7 +50,7 @@ function renderEpisodes(episodesToRender) {
         </div>
       `;
     } else {
-      // Todos los demás episodios se cargan en el reproductor de YouTube
+      // Todos los demás episodios cargan el reproductor normal
       card.innerHTML = `
         <h3>${ep.title}</h3>
         <iframe 
@@ -67,9 +67,9 @@ function renderEpisodes(episodesToRender) {
   });
 }
 
-// Inicialización de eventos y datos al cargar el DOM
+// Inicialización de eventos y datos al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-  // Asignar los eventos de click a los botones
+  // Asignar los eventos de click a los botones desde el inicio
   const filterButtons = document.querySelectorAll('.filter-btn');
   filterButtons.forEach(button => {
     button.addEventListener('click', () => {
