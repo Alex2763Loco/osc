@@ -2,6 +2,9 @@ var allEpisodes = [];
 var currentFilter = 'all';
 var searchQuery = '';
 
+// Cargar favoritos guardados en el navegador
+var favoriteIds = JSON.parse(localStorage.getItem('osc_favs') || '[]');
+
 var blockedEmbedIds = ["lcGtU2eYeyU", "YQa2-DY7Y0Q"];
 var audioCtx = null;
 
@@ -39,10 +42,34 @@ function playGuiHoverSound() {
   }
 }
 
+function toggleFavorite(id, starElement) {
+  var index = favoriteIds.indexOf(id);
+  if (index === -1) {
+    favoriteIds.push(id);
+    starElement.classList.add('active');
+    starElement.textContent = '★';
+  } else {
+    favoriteIds.splice(index, 1);
+    starElement.classList.remove('active');
+    starElement.textContent = '☆';
+  }
+  
+  localStorage.setItem('osc_favs', JSON.stringify(favoriteIds));
+
+  // Si estamos en la pestaña de favoritos, actualizamos la vista
+  if (currentFilter === 'favs') {
+    applyFilters();
+  }
+}
+
 function applyFilters() {
   var filtered = allEpisodes;
 
-  if (currentFilter !== 'all') {
+  if (currentFilter === 'favs') {
+    filtered = filtered.filter(function(ep) {
+      return favoriteIds.indexOf(ep.youtubeId) !== -1;
+    });
+  } else if (currentFilter !== 'all') {
     filtered = filtered.filter(function(ep) {
       return ep.show === currentFilter;
     });
@@ -65,7 +92,10 @@ function renderEpisodes(episodesToRender) {
   episodesContainer.innerHTML = '';
 
   if (episodesToRender.length === 0) {
-    episodesContainer.innerHTML = '<p class="no-episodes">No se encontraron episodios.</p>';
+    var emptyMessage = currentFilter === 'favs' 
+      ? 'Aún no has guardado episodios en Favoritos (haz clic en la estrella ☆ para guardar uno).'
+      : 'No se encontraron episodios.';
+    episodesContainer.innerHTML = '<p class="no-episodes">' + emptyMessage + '</p>';
     return;
   }
 
@@ -75,9 +105,18 @@ function renderEpisodes(episodesToRender) {
 
     card.addEventListener('mouseenter', playGuiHoverSound);
 
-    if (blockedEmbedIds.indexOf(ep.youtubeId) !== -1) {
-      card.innerHTML = 
+    var isFav = favoriteIds.indexOf(ep.youtubeId) !== -1;
+    var starIcon = isFav ? '★' : '☆';
+    var starClass = isFav ? 'star-btn active' : 'star-btn';
+
+    var headerHTML = 
+      '<div class="card-header">' +
         '<h3>' + ep.title + '</h3>' +
+        '<button class="' + starClass + '" data-id="' + ep.youtubeId + '" title="Guardar en favoritos">' + starIcon + '</button>' +
+      '</div>';
+
+    if (blockedEmbedIds.indexOf(ep.youtubeId) !== -1) {
+      card.innerHTML = headerHTML +
         '<div class="thumb-container">' +
           '<img src="https://img.youtube.com/vi/' + ep.youtubeId + '/hqdefault.jpg" alt="' + ep.title + '">' +
           '<a href="https://www.youtube.com/watch?v=' + ep.youtubeId + '" target="_blank" class="yt-link-btn">' +
@@ -85,10 +124,16 @@ function renderEpisodes(episodesToRender) {
           '</a>' +
         '</div>';
     } else {
-      card.innerHTML = 
-        '<h3>' + ep.title + '</h3>' +
+      card.innerHTML = headerHTML +
         '<iframe src="https://www.youtube.com/embed/' + ep.youtubeId + '" title="' + ep.title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
     }
+
+    // Agregar evento a la estrella de la tarjeta
+    var starBtn = card.querySelector('.star-btn');
+    starBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleFavorite(ep.youtubeId, starBtn);
+    });
 
     episodesContainer.appendChild(card);
   });
