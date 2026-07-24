@@ -52,10 +52,11 @@ body {
   z-index: -1;
   background-image: url('pato.png');
   background-repeat: repeat;
-  background-size: 120px;
-  opacity: 0.7; /* Transparencia al 70% */
+  background-size: 200px; /* Tamaño más grande para separarlos bastante */
+  background-position: center;
+  opacity: 0.7; /* Casi casi al 100%, súper visibles */
   pointer-events: none;
-  animation: diagonalMove 25s linear infinite;
+  animation: diagonalMove 30s linear infinite;
   will-change: transform;
 }
 
@@ -64,7 +65,7 @@ body {
     transform: translate(0, 0);
   }
   100% {
-    transform: translate(-120px, -120px); /* Debe coincidir con background-size */
+    transform: translate(-200px, -200px); /* Coincide con el background-size */
   }
 }
 
