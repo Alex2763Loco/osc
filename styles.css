@@ -1,287 +1,539 @@
-/* Variables de color para Temas Claro/Oscuro */
+ /* Variables de color para Temas Claro/Oscuro */
+
 :root {
+
   --bg-color: #121212;
+
   --card-bg: #1e1e1e;
+
   --text-color: #ffffff;
+
   --text-secondary: #aaaaaa;
+
   --accent-color: #00ff66;
+
   --btn-bg: #2a2a2a;
+
   --btn-hover: #3a3a3a;
+
   --input-bg: #1e1e1e;
+
   --border-color: #333333;
+
 }
+
+
 
 [data-theme="light"] {
+
   --bg-color: #f4f4f9;
+
   --card-bg: #ffffff;
+
   --text-color: #121212;
+
   --text-secondary: #555555;
+
   --accent-color: #00b347;
+
   --btn-bg: #e0e0e0;
+
   --btn-hover: #d0d0d0;
+
   --input-bg: #ffffff;
+
   --border-color: #cccccc;
+
 }
+
+
 
 /* Estilos generales */
+
 body {
+
   margin: 0;
+
   padding: 0;
+
   background-color: var(--bg-color);
+
   color: var(--text-color);
+
   font-family: Arial, sans-serif;
+
   text-align: center;
+
   transition: background-color 0.3s, color 0.3s;
+
 }
+
+
 
 header {
+
   padding: 20px 10px;
+
 }
+
+
 
 .header-top {
+
   display: flex;
+
   justify-content: center;
+
   align-items: center;
+
   gap: 20px;
+
   flex-wrap: wrap;
+
 }
+
+
 
 header h1 {
+
   color: var(--accent-color);
+
   margin: 0;
+
 }
+
+
 
 header p {
+
   color: var(--text-secondary);
+
 }
 
-/* --- ESTILO DEL PATO MASCOTA (CON 60% DE CONTRASTE) --- */
-.pato-mascota {
-  width: 75px;
-  height: auto;
-  border-radius: 10px;
-  
-  /* Filtro de contraste al 60% exacto */
-  filter: contrast(60%);
-  
-  transition: transform 0.25s ease, filter 0.25s ease;
-}
 
-.pato-mascota:hover {
-  transform: scale(1.1);
-  filter: contrast(80%);
-}
 
 /* Botón de cambio de tema */
+
 .theme-btn {
+
   background-color: var(--btn-bg);
+
   color: var(--text-color);
+
   border: 1px solid var(--border-color);
+
   padding: 8px 16px;
+
   border-radius: 20px;
+
   cursor: pointer;
+
   font-weight: bold;
+
   transition: background-color 0.2s, transform 0.2s;
+
 }
+
+
 
 .theme-btn:hover {
+
   background-color: var(--btn-hover);
+
   transform: scale(1.05);
+
 }
+
+
 
 /* Contenedor de controles */
+
 .controls-container {
+
   max-width: 900px;
+
   margin: 0 auto 30px auto;
+
   padding: 0 20px;
+
 }
+
+
 
 /* Barra de búsqueda */
+
 .search-box {
+
   margin-bottom: 10px;
+
 }
+
+
 
 .search-box input {
+
   width: 100%;
+
   max-width: 500px;
+
   padding: 12px 20px;
+
   border-radius: 25px;
+
   border: 2px solid var(--border-color);
+
   background-color: var(--input-bg);
+
   color: var(--text-color);
+
   font-size: 1rem;
+
   outline: none;
+
   transition: border-color 0.2s, box-shadow 0.2s;
+
 }
+
+
 
 .search-box input:focus {
+
   border-color: var(--accent-color);
+
   box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+
 }
 
-/* Contenedor de los botones de filtro */
+
+
+/* Contenedor de los botones de filtro con espacio suficiente */
+
 .filter-container {
+
   display: flex;
+
   justify-content: center;
+
   align-items: center;
+
   gap: 10px;
+
   flex-wrap: wrap;
+
   padding: 15px 10px;
+
   margin-top: 5px;
+
 }
+
+
 
 /* Ajuste de tamaño y relleno de los botones */
+
 .filter-btn {
+
   background-color: var(--btn-bg);
+
   color: var(--text-color);
+
   border: none;
+
   padding: 8px 16px;
+
   border-radius: 20px;
+
   cursor: pointer;
+
   font-weight: bold;
+
   font-size: 0.9rem;
+
   transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s, box-shadow 0.2s;
+
 }
+
+
 
 /* Efecto Hover equilibrado */
+
 .filter-btn:hover {
+
   background-color: var(--btn-hover);
+
   transform: scale(1.1) !important;
+
   box-shadow: 0 4px 12px rgba(0, 255, 102, 0.3);
+
 }
+
+
 
 .filter-btn.active {
+
   background-color: var(--text-color);
+
   color: var(--bg-color);
+
   transform: scale(1.05);
+
 }
+
+
 
 .filter-btn.favorites-btn {
+
   color: #ffcc00;
+
 }
+
+
 
 /* Cuadrícula de 3 columnas */
+
 .grid-container {
+
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
+
   gap: 20px;
+
   padding: 0 20px 40px 20px;
+
   max-width: 1200px;
+
   margin: 0 auto;
+
 }
+
+
 
 /* Tarjetas de episodios */
+
 .card {
+
   background-color: var(--card-bg);
+
   border-radius: 10px;
+
   padding: 15px;
+
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   position: relative;
+
   transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
+
 }
+
+
 
 .card:hover {
+
   transform: scale(1.06);
+
   box-shadow: 0 8px 25px rgba(0, 255, 102, 0.25);
+
   z-index: 10;
+
 }
+
+
 
 /* Encabezado de la tarjeta con botón de estrella */
+
 .card-header {
+
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
+
   width: 100%;
+
   margin-bottom: 12px;
+
 }
+
+
 
 .card h3 {
+
   font-size: 0.95rem;
+
   margin: 0;
+
   height: 40px;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   flex-grow: 1;
+
 }
+
+
 
 .star-btn {
+
   background: none;
+
   border: none;
+
   font-size: 1.4rem;
+
   color: #666;
+
   cursor: pointer;
+
   padding: 0 5px;
+
   transition: transform 0.2s, color 0.2s;
+
 }
+
+
 
 .star-btn:hover {
+
   transform: scale(1.3);
+
 }
+
+
 
 .star-btn.active {
+
   color: #ffcc00;
+
   text-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
+
 }
+
+
 
 /* Reproductor iframe responsivo */
+
 .card iframe {
+
   width: 100%;
+
   aspect-ratio: 16 / 9;
+
   border-radius: 8px;
+
   border: none;
+
 }
+
+
 
 /* Miniaturas con enlace directo */
+
 .thumb-container {
+
   width: 100%;
+
   position: relative;
+
   display: flex;
+
   flex-direction: column;
+
 }
+
+
 
 .thumb-container img {
+
   width: 100%;
+
   aspect-ratio: 16 / 9;
+
   object-fit: cover;
+
   border-radius: 8px;
+
 }
+
+
 
 .yt-link-btn {
+
   margin-top: 10px;
+
   background-color: #ff0000;
+
   color: #ffffff;
+
   text-decoration: none;
+
   padding: 10px;
+
   border-radius: 6px;
+
   font-weight: bold;
+
   font-size: 0.85rem;
+
   transition: transform 0.2s, background-color 0.2s;
+
 }
+
+
 
 .yt-link-btn:hover {
+
   background-color: #cc0000;
+
   transform: scale(1.05);
+
 }
+
+
 
 .no-episodes {
+
   grid-column: 1 / -1;
+
   color: var(--text-secondary);
+
   font-size: 1.1rem;
+
 }
+
+
 
 /* Adaptación para pantallas pequeñas */
+
 @media (max-width: 900px) {
+
   .grid-container {
+
     grid-template-columns: repeat(2, 1fr);
+
   }
+
 }
 
+
+
 @media (max-width: 600px) {
+
   .grid-container {
+
     grid-template-columns: 1fr;
+
   }
-}
+
+} 
