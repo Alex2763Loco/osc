@@ -55,6 +55,23 @@ header p {
   color: var(--text-secondary);
 }
 
+/* --- ESTILO DEL PATO MASCOTA (CON 60% DE CONTRASTE) --- */
+.pato-mascota {
+  width: 75px;
+  height: auto;
+  border-radius: 10px;
+  
+  /* Filtro de contraste al 60% exacto */
+  filter: contrast(60%);
+  
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.pato-mascota:hover {
+  transform: scale(1.1);
+  filter: contrast(80%);
+}
+
 /* Botón de cambio de tema */
 .theme-btn {
   background-color: var(--btn-bg);
@@ -102,7 +119,7 @@ header p {
   box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
 }
 
-/* Contenedor de los botones de filtro con espacio suficiente */
+/* Contenedor de los botones de filtro */
 .filter-container {
   display: flex;
   justify-content: center;
