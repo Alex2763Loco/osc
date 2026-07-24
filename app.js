@@ -5,7 +5,6 @@ var searchQuery = '';
 // Cargar favoritos guardados en el navegador
 var favoriteIds = JSON.parse(localStorage.getItem('osc_favs') || '[]');
 
-var blockedEmbedIds = ["lcGtU2eYeyU", "YQa2-DY7Y0Q"];
 var audioCtx = null;
 
 function initAudio() {
@@ -113,6 +112,76 @@ function renderEpisodes(episodesToRender) {
       '<div class="card-header">' +
         '<h3>' + ep.title + '</h3>' +
         '<button class="' + starClass + '" data-id="' + ep.youtubeId + '" title="Guardar en favoritos">' + starIcon + '</button>' +
+      '</div>';
+
+    // Renderizado uniforme para todos los episodios con iframe
+    card.innerHTML = headerHTML +
+      '<iframe src="https://www.youtube.com/embed/' + ep.youtubeId + '" title="' + ep.title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+
+    // Agregar evento a la estrella de la tarjeta
+    var starBtn = card.querySelector('.star-btn');
+    starBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleFavorite(ep.youtubeId, starBtn);
+    });
+
+    episodesContainer.appendChild(card);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.addEventListener('click', initAudio, { once: true });
+
+  var searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      searchQuery = e.target.value;
+      applyFilters();
+    });
+  }
+
+  var filterButtons = document.querySelectorAll('.filter-btn');
+  filterButtons.forEach(function(button) {
+    button.addEventListener('mouseenter', playGuiHoverSound);
+
+    button.addEventListener('click', function() {
+      filterButtons.forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      button.classList.add('active');
+
+      currentFilter = button.getAttribute('data-show');
+      applyFilters();
+    });
+  });
+
+  var themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function() {
+      var currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.textContent = '☀️ Modo Claro';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeToggle.textContent = '🌙 Modo Oscuro';
+      }
+    });
+  }
+
+  fetch('episodes.json')
+    .then(function(response) {
+      if (!response.ok) throw new Error("Error en episodes.json");
+      return response.json();
+    })
+    .then(function(episodes) {
+      allEpisodes = episodes;
+      renderEpisodes(allEpisodes);
+    })
+    .catch(function(error) {
+      console.error('Error al cargar episodes.json:', error);
+    });
+});
       '</div>';
 
     if (blockedEmbedIds.indexOf(ep.youtubeId) !== -1) {
