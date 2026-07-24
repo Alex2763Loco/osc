@@ -3,46 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WOTOSC!</title>
-  <link rel="stylesheet" href="style.css">
+  <title>OSCW</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
   <header>
-    <div class="logo-container">
-      <img src="pato.png" alt="Mascota Pato WOTOSC" class="pato-mascota">
-      <div class="title-group">
-        <h1>WOTOSC!</h1>
-        <p class="subtitle">¡El archivo definitivo de la OSC!</p>
-      </div>
+    <div class="header-top">
+      <h1>OSCW</h1>
+      <button id="theme-toggle" class="theme-btn">☀️ Modo Claro</button>
     </div>
+    <p>¡El archivo definitivo de BFDI, II, ONE, AB, BS, OF, ITFT, TNM y más!</p>
   </header>
 
-  <!-- BARRA DE BÚSQUEDA Y FILTROS -->
-  <main class="container">
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="🔍 Buscar series...">
+  <div class="controls-container">
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="🔍 Buscar episodios por título...">
     </div>
 
-    <div class="filter-tags" id="filterContainer">
-      <button class="tag active" data-show="all">Todos</button>
-      <button class="tag" data-show="fav">⭐ Favoritos</button>
-      <button class="tag" data-show="BFDI">BFDI</button>
-      <button class="tag" data-show="II">II</button>
-      <button class="tag" data-show="ONE">ONE</button>
-      <button class="tag" data-show="AB">AB</button>
-      <button class="tag" data-show="TNM">TNM</button>
-      <button class="tag" data-show="BS">BS</button>
-      <button class="tag" data-show="OF">OF</button>
-      <button class="tag" data-show="ITFT">ITFT</button>
+    <div class="filter-container">
+      <button class="filter-btn active" data-show="all">Todos</button>
+      <button class="filter-btn favorites-btn" data-show="favs">★ Favoritos</button>
+      <button class="filter-btn" data-show="BFDI">BFDI</button>
+      <button class="filter-btn" data-show="II">II</button>
+      <button class="filter-btn" data-show="ONE">ONE</button>
+      <button class="filter-btn" data-show="AB">AB</button>
+      <button class="filter-btn" data-show="BS">BS</button>
+      <button class="filter-btn" data-show="TNM">TNM</button>
+      <button class="filter-btn" data-show="OF">OF</button>
+      <button class="filter-btn" data-show="ITFT">ITFT</button>
     </div>
+  </div>
 
-    <!-- GRILLA DE EPISODIOS -->
-    <div class="episodes-grid" id="episodesGrid">
-      <!-- Los episodios se cargan dinámicamente desde app.js -->
-    </div>
-  </main>
+  <main id="episodes-container" class="grid-container">
+    </main>
 
   <script src="app.js"></script>
 </body>
