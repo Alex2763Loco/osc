@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WOTOSC</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
 
   <!-- Scripts de Firebase obligatorios (v8 compat) -->
@@ -16,26 +17,38 @@
   <!-- Capa del fondo animado -->
   <div class="background-pattern"></div>
 
-<header>
-  <div class="header-top">
-    <h1>WOTOSC</h1>
-    <button id="theme-toggle" class="theme-btn">☀️ Modo Claro</button>
-    
-    <!-- Botón entrar si está desconectado -->
-    <button id="login-btn" class="theme-btn">🔑 Entrar con Google</button>
-    
-    <!-- Contenedor visible de Perfil -->
-    <div id="user-profile" style="display: flex; align-items: center; gap: 8px; margin: 0 10px;">
-      <img id="user-avatar" src="profile_match.png" alt="Perfil" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
-      <span id="user-name-display" onclick="toggleNameEdit()" style="cursor: pointer; color: #00ff66; font-weight: bold; font-size: 15px;" title="Haz clic para cambiar nombre">MiUsuario</span>
-      <input type="text" id="user-name-edit" style="display: none; background: #222; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px; padding: 2px 6px; font-size: 14px; font-weight: bold;">
-    </div>
+  <header>
+    <div class="header-top">
+      <h1>WOTOSC</h1>
+      <button id="theme-toggle" class="theme-btn">☀️ Modo Claro</button>
+      
+      <!-- Botón entrar si está desconectado -->
+      <button id="login-btn" class="theme-btn">🔑 Entrar con Google</button>
+      
+      <!-- Contenedor de Perfil -->
+      <div id="user-profile" style="display: flex; align-items: center; gap: 8px; margin: 0 10px;">
+        
+        <!-- Input oculto para abrir el explorador de archivos -->
+        <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="changeAvatar(event)">
+        
+        <!-- Foto de perfil (Al hacer clic abre el explorador de archivos) -->
+        <img id="user-avatar" src="profile_match.png" alt="Perfil" onclick="document.getElementById('avatar-input').click()" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 2px solid #00ff66;" title="Haz clic para cambiar foto">
+        
+        <!-- Nombre de usuario desplegado -->
+        <span id="user-name-display" onclick="toggleNameEdit()" style="cursor: pointer; color: #00ff66; font-weight: bold; font-size: 15px;" title="Haz clic para cambiar nombre">MiUsuario</span>
+        
+        <!-- Campo de texto y Botón Guardar -->
+        <div id="edit-name-container" style="display: none; align-items: center; gap: 4px;">
+          <input type="text" id="user-name-edit" style="background: #222; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px; padding: 2px 6px; font-size: 14px; font-weight: bold;">
+          <button onclick="saveCustomName()" class="theme-btn" style="padding: 2px 8px; font-size: 12px; cursor: pointer;">Guardar</button>
+        </div>
+      </div>
 
-    <button id="logout-btn" class="theme-btn" style="display: none;">Cerrar sesión</button>
-  </div>
-  <p>¡El archivo definitivo de BFDI, II, ONE Y más!</p>
-</header>
-  
+      <button id="logout-btn" class="theme-btn" style="display: none;">Cerrar sesión</button>
+    </div>
+    <p>¡El archivo definitivo de BFDI, II, ONE Y más!</p>
+  </header>
+
   <div class="controls-container">
     <div class="search-box">
       <input type="text" id="search-input" placeholder="🔍 Buscar episodios por título...">
