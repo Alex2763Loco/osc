@@ -1,12 +1,30 @@
+// Configuración de Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBJLXg0Cx19Xn46U0KGPR8-3Hrz23sy08o",
+  authDomain: "wotosc-66c47.firebaseapp.com",
+  projectId: "wotosc-66c47",
+  storageBucket: "wotosc-66c47.firebasestorage.app",
+  messagingSenderId: "252026023370",
+  appId: "1:252026023370:web:cf217f507607ffa0bc3333",
+  measurementId: "G-F23DFYVPLF"
+};
+
+// Inicializar Firebase
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
 var allEpisodes = [];
 var currentFilter = 'all';
 var searchQuery = '';
-
-// Cargar favoritos guardados en el navegador
-var favoriteIds = JSON.parse(localStorage.getItem('osc_favs') || '[]');
-
+var favoriteIds = [];
+var currentUser = null;
 var audioCtx = null;
 
+// Sistema de Audio
 function initAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -41,7 +59,12 @@ function playGuiHoverSound() {
   }
 }
 
-function toggleFavorite(id, starElement) {
+// Favoritos (Local o Nube)
+function loadLocalFavorites() {
+  favoriteIds = JSON.parse(localStorage.getItem('osc_favs') || '[]');
+}
+
+function saveFavorites(id, starElement) {
   var index = favoriteIds.indexOf(id);
   if (index === -1) {
     favoriteIds.push(id);
@@ -52,10 +75,17 @@ function toggleFavorite(id, starElement) {
     starElement.classList.remove('active');
     starElement.textContent = '☆';
   }
-  
-  localStorage.setItem('osc_favs', JSON.stringify(favoriteIds));
 
-  // Si estamos en la pestaña de favoritos, actualizamos la vista
+  if (currentUser) {
+    // Guardar en Firestore si hay usuario conectado
+    db.collection('users').doc(currentUser.uid).set({
+      favorites: favoriteIds
+    }, { merge: true });
+  } else {
+    // Guardar en localStorage si es visitante
+    localStorage.setItem('osc_favs', JSON.stringify(favoriteIds));
+  }
+
   if (currentFilter === 'favs') {
     applyFilters();
   }
@@ -101,7 +131,6 @@ function renderEpisodes(episodesToRender) {
   episodesToRender.forEach(function(ep) {
     var card = document.createElement('div');
     card.className = 'card';
-
     card.addEventListener('mouseenter', playGuiHoverSound);
 
     var isFav = favoriteIds.indexOf(ep.youtubeId) !== -1;
@@ -117,20 +146,70 @@ function renderEpisodes(episodesToRender) {
     card.innerHTML = headerHTML +
       '<iframe src="https://www.youtube.com/embed/' + ep.youtubeId + '" title="' + ep.title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
 
-    // Agregar evento a la estrella de la tarjeta
     var starBtn = card.querySelector('.star-btn');
     starBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      toggleFavorite(ep.youtubeId, starBtn);
+      saveFavorites(ep.youtubeId, starBtn);
     });
 
     episodesContainer.appendChild(card);
   });
 }
 
+// Inicializar Aplicación
 document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('click', initAudio, { once: true });
 
+  var loginBtn = document.getElementById('login-btn');
+  var logoutBtn = document.getElementById('logout-btn');
+  var userInfo = document.getElementById('user-info');
+
+  if (loginBtn) {
+    loginBtn.addEventListener('click', function() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(function(error) {
+        console.error("Error al iniciar sesión:", error);
+      });
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function() {
+      auth.signOut();
+    });
+  }
+
+  // Escuchar estado de autenticación
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      currentUser = user;
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (logoutBtn) logoutBtn.style.display = 'inline-block';
+      if (userInfo) {
+        userInfo.style.display = 'inline-block';
+        userInfo.textContent = '👋 ' + user.displayName;
+      }
+
+      // Cargar favoritos del usuario desde la base de datos
+      db.collection('users').doc(user.uid).get().then(function(doc) {
+        if (doc.exists && doc.data().favorites) {
+          favoriteIds = doc.data().favorites;
+        } else {
+          loadLocalFavorites();
+        }
+        applyFilters();
+      });
+    } else {
+      currentUser = null;
+      if (loginBtn) loginBtn.style.display = 'inline-block';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+      if (userInfo) userInfo.style.display = 'none';
+      loadLocalFavorites();
+      applyFilters();
+    }
+  });
+
+  // Buscador
   var searchInput = document.getElementById('search-input');
   if (searchInput) {
     searchInput.addEventListener('input', function(e) {
@@ -139,6 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Filtros de navegación
   var filterButtons = document.querySelectorAll('.filter-btn');
   filterButtons.forEach(function(button) {
     button.addEventListener('mouseenter', playGuiHoverSound);
@@ -154,6 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Modo Claro/Oscuro
   var themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
     themeToggle.addEventListener('click', function() {
@@ -168,6 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Cargar lista de episodios
   fetch('episodes.json')
     .then(function(response) {
       if (!response.ok) throw new Error("Error en episodes.json");
@@ -175,9 +257,9 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .then(function(episodes) {
       allEpisodes = episodes;
-      renderEpisodes(allEpisodes);
+      applyFilters();
     })
     .catch(function(error) {
-      console.error('Error al cargar episodes.json:', error);
+      console.error('Error al cargar episodios:', error);
     });
 });
