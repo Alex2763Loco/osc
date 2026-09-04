@@ -77,17 +77,67 @@ function saveFavorites(id, starElement) {
   }
 
   if (currentUser) {
-    // Guardar en Firestore si hay usuario conectado
     db.collection('users').doc(currentUser.uid).set({
       favorites: favoriteIds
     }, { merge: true });
   } else {
-    // Guardar en localStorage si es visitante
     localStorage.setItem('osc_favs', JSON.stringify(favoriteIds));
   }
 
   if (currentFilter === 'favs') {
     applyFilters();
+  }
+}
+
+// Gestión del Perfil (Avatar + Nombre Personalizado)
+function setupProfile() {
+  const btnLogin = document.getElementById('login-btn');
+  const btnLogout = document.getElementById('logout-btn');
+  const userAvatar = document.getElementById('user-avatar');
+  const userNameDisplay = document.getElementById('user-name-display');
+  const userNameEdit = document.getElementById('user-name-edit');
+
+  if (currentUser) {
+    if (btnLogin) btnLogin.style.display = 'none';
+    if (btnLogout) btnLogout.style.display = 'inline-block';
+    if (userAvatar) userAvatar.style.display = 'inline-block';
+    if (userNameDisplay) userNameDisplay.style.display = 'inline-block';
+    if (userNameEdit) userNameEdit.style.display = 'none';
+  } else {
+    if (btnLogin) btnLogin.style.display = 'inline-block';
+    if (btnLogout) btnLogout.style.display = 'none';
+    if (userAvatar) userAvatar.style.display = 'none';
+    if (userNameDisplay) userNameDisplay.style.display = 'none';
+    if (userNameEdit) userNameEdit.style.display = 'none';
+  }
+}
+
+function toggleNameEdit() {
+  const userNameDisplay = document.getElementById('user-name-display');
+  const userNameEdit = document.getElementById('user-name-edit');
+  if (!userNameDisplay || !userNameEdit) return;
+
+  userNameEdit.value = userNameDisplay.textContent;
+  userNameDisplay.style.display = 'none';
+  userNameEdit.style.display = 'inline-block';
+  userNameEdit.focus();
+}
+
+function saveCustomName(e) {
+  if (e.key === 'Enter') {
+    const userNameEdit = document.getElementById('user-name-edit');
+    const userNameDisplay = document.getElementById('user-name-display');
+    const newName = userNameEdit.value.trim();
+
+    if (newName && currentUser) {
+      db.collection('users').doc(currentUser.uid).set({
+        displayName: newName
+      }, { merge: true }).then(() => {
+        userNameDisplay.textContent = newName;
+        userNameDisplay.style.display = 'inline-block';
+        userNameEdit.style.display = 'none';
+      });
+    }
   }
 }
 
@@ -162,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var loginBtn = document.getElementById('login-btn');
   var logoutBtn = document.getElementById('logout-btn');
-  var userInfo = document.getElementById('user-info');
+  var userNameEdit = document.getElementById('user-name-edit');
 
   if (loginBtn) {
     loginBtn.addEventListener('click', function() {
@@ -179,30 +229,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  if (userNameEdit) {
+    userNameEdit.addEventListener('keydown', saveCustomName);
+  }
+
   // Escuchar estado de autenticación
   auth.onAuthStateChanged(function(user) {
     if (user) {
       currentUser = user;
-      if (loginBtn) loginBtn.style.display = 'none';
-      if (logoutBtn) logoutBtn.style.display = 'inline-block';
-      if (userInfo) {
-        userInfo.style.display = 'inline-block';
-        userInfo.textContent = '👋 ' + user.displayName;
-      }
+      setupProfile();
 
-      // Sincronizar y cargar favoritos desde Firestore
       var localFavs = JSON.parse(localStorage.getItem('osc_favs') || '[]');
       db.collection('users').doc(user.uid).get().then(function(doc) {
-        if (doc.exists && doc.data().favorites) {
-          var cloudFavs = doc.data().favorites;
-          // Unir sin duplicados
-          favoriteIds = Array.from(new Set(localFavs.concat(cloudFavs)));
-          // Guardar fusión en Firestore y limpiar local sobrante
-          db.collection('users').doc(user.uid).set({ favorites: favoriteIds }, { merge: true });
+        var userNameDisplay = document.getElementById('user-name-display');
+        
+        if (doc.exists) {
+          // Favoritos
+          if (doc.data().favorites) {
+            var cloudFavs = doc.data().favorites;
+            favoriteIds = Array.from(new Set(localFavs.concat(cloudFavs)));
+            db.collection('users').doc(user.uid).set({ favorites: favoriteIds }, { merge: true });
+          } else {
+            favoriteIds = localFavs;
+          }
+
+          // Nombre personalizado
+          if (doc.data().displayName && userNameDisplay) {
+            userNameDisplay.textContent = doc.data().displayName;
+          } else if (user.displayName && userNameDisplay) {
+            userNameDisplay.textContent = user.displayName;
+          }
         } else {
           favoriteIds = localFavs;
-          if (localFavs.length > 0) {
-            db.collection('users').doc(user.uid).set({ favorites: localFavs });
+          if (userNameDisplay && user.displayName) {
+            userNameDisplay.textContent = user.displayName;
           }
         }
         applyFilters();
@@ -214,9 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     } else {
       currentUser = null;
-      if (loginBtn) loginBtn.style.display = 'inline-block';
-      if (logoutBtn) logoutBtn.style.display = 'none';
-      if (userInfo) userInfo.style.display = 'none';
+      setupProfile();
       loadLocalFavorites();
       applyFilters();
     }
