@@ -41,7 +41,7 @@ body {
 }
 
 /* ==========================================
-   Fondo Animado en Diagonal (Patrón OSC.webp)
+   Fondo Animado en Diagonal
    ========================================== */
 .background-pattern {
   position: fixed;
@@ -51,16 +51,14 @@ body {
   height: 200%;
   z-index: -1;
   
-  background-image: url('OSC.webp');
+  /* Si deseas agregar una nueva imagen en el futuro,
+     descomenta la siguiente línea y pon la ruta de tu nuevo archivo: */
+  /* background-image: url('tu_nueva_imagen.webp'); */
+  
   background-repeat: repeat;
-  
-  /* Ajusta estos dos números iguales (ej: 180px 180px): 
-     Cuanto MÁS GRANDE sea el número, MÁS ESPACIO/SEPARACIÓN habrá entre los logos. */
   background-size: 100px 50px; 
-  
-  opacity: 0.7; /* Transparencia al 70% */
+  opacity: 0.7;
   pointer-events: none;
-  
   animation: diagonalMove 25s linear infinite;
   will-change: transform;
 }
@@ -70,7 +68,7 @@ body {
     transform: translate(0, 0);
   }
   100% {
-    transform: translate(-180px, -180px); /* DEBE SER IGUAL al número de background-size */
+    transform: translate(-180px, -180px);
   }
 }
 
