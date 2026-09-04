@@ -5,16 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WOTOSC</title>
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Scripts de Firebase obligatorios (v8 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
 
-  <!-- Capa del fondo animado en diagonal -->
+  <!-- Capa del fondo animado -->
   <div class="background-pattern"></div>
 
   <header>
     <div class="header-top">
       <h1>WOTOSC</h1>
       <button id="theme-toggle" class="theme-btn">☀️ Modo Claro</button>
+      
+      <!-- Botones de sesión -->
+      <button id="login-btn" class="theme-btn">🔑 Entrar con Google</button>
+      <span id="user-info" style="display: none; font-weight: bold; color: var(--accent-color);"></span>
+      <button id="logout-btn" class="theme-btn" style="display: none;">Cerrar sesión</button>
     </div>
     <p>¡El archivo definitivo de BFDI, II, ONE Y más!</p>
   </header>
