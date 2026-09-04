@@ -1,6 +1,6 @@
 // Configuración de Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBJLXg0Cx19Xn46U0KGPR8-3Hrz23sy08o",
+  apiKey: "AIzaSyDcUdBkyrT6jyV-w1hycZ25tMFR3JAk5eE",
   authDomain: "wotosc-66c47.firebaseapp.com",
   projectId: "wotosc-66c47",
   storageBucket: "wotosc-66c47.firebasestorage.app",
@@ -190,15 +190,28 @@ document.addEventListener('DOMContentLoaded', function() {
         userInfo.textContent = '👋 ' + user.displayName;
       }
 
-      // Cargar favoritos del usuario desde la base de datos
+      // Sincronizar y cargar favoritos desde Firestore
+      var localFavs = JSON.parse(localStorage.getItem('osc_favs') || '[]');
       db.collection('users').doc(user.uid).get().then(function(doc) {
         if (doc.exists && doc.data().favorites) {
-          favoriteIds = doc.data().favorites;
+          var cloudFavs = doc.data().favorites;
+          // Unir sin duplicados
+          favoriteIds = Array.from(new Set(localFavs.concat(cloudFavs)));
+          // Guardar fusión en Firestore y limpiar local sobrante
+          db.collection('users').doc(user.uid).set({ favorites: favoriteIds }, { merge: true });
         } else {
-          loadLocalFavorites();
+          favoriteIds = localFavs;
+          if (localFavs.length > 0) {
+            db.collection('users').doc(user.uid).set({ favorites: localFavs });
+          }
         }
         applyFilters();
+      }).catch(function(err) {
+        console.error("Error leyendo Firestore:", err);
+        loadLocalFavorites();
+        applyFilters();
       });
+
     } else {
       currentUser = null;
       if (loginBtn) loginBtn.style.display = 'inline-block';
