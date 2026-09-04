@@ -36,7 +36,6 @@ function initAudio() {
 
 function playGuiHoverSound() {
   try {
-    initAudio();
     if (!audioCtx || audioCtx.state !== 'running') return;
 
     var osc = audioCtx.createOscillator();
@@ -89,55 +88,71 @@ function saveFavorites(id, starElement) {
   }
 }
 
-// Gestión del Perfil (Avatar + Nombre Personalizado)
+// Gestión de Visibilidad del Perfil
 function setupProfile() {
   const btnLogin = document.getElementById('login-btn');
   const btnLogout = document.getElementById('logout-btn');
-  const userAvatar = document.getElementById('user-avatar');
-  const userNameDisplay = document.getElementById('user-name-display');
-  const userNameEdit = document.getElementById('user-name-edit');
+  const userProfile = document.getElementById('user-profile');
 
   if (currentUser) {
     if (btnLogin) btnLogin.style.display = 'none';
     if (btnLogout) btnLogout.style.display = 'inline-block';
-    if (userAvatar) userAvatar.style.display = 'inline-block';
-    if (userNameDisplay) userNameDisplay.style.display = 'inline-block';
-    if (userNameEdit) userNameEdit.style.display = 'none';
+    if (userProfile) userProfile.style.display = 'flex';
   } else {
     if (btnLogin) btnLogin.style.display = 'inline-block';
     if (btnLogout) btnLogout.style.display = 'none';
-    if (userAvatar) userAvatar.style.display = 'none';
-    if (userNameDisplay) userNameDisplay.style.display = 'none';
-    if (userNameEdit) userNameEdit.style.display = 'none';
+    if (userProfile) userProfile.style.display = 'flex'; // Mantener visible perfil local
   }
 }
 
+// Mostrar campo para editar nombre
 function toggleNameEdit() {
   const userNameDisplay = document.getElementById('user-name-display');
+  const editContainer = document.getElementById('edit-name-container');
   const userNameEdit = document.getElementById('user-name-edit');
-  if (!userNameDisplay || !userNameEdit) return;
 
-  userNameEdit.value = userNameDisplay.textContent;
-  userNameDisplay.style.display = 'none';
-  userNameEdit.style.display = 'inline-block';
-  userNameEdit.focus();
+  if (userNameDisplay && editContainer && userNameEdit) {
+    userNameEdit.value = userNameDisplay.textContent;
+    userNameDisplay.style.display = 'none';
+    editContainer.style.display = 'flex';
+    userNameEdit.focus();
+  }
 }
 
-function saveCustomName(e) {
-  if (e.key === 'Enter') {
-    const userNameEdit = document.getElementById('user-name-edit');
-    const userNameDisplay = document.getElementById('user-name-display');
-    const newName = userNameEdit.value.trim();
+// Guardar nuevo nombre (al presionar el botón o Enter)
+function saveCustomName() {
+  const userNameEdit = document.getElementById('user-name-edit');
+  const userNameDisplay = document.getElementById('user-name-display');
+  const editContainer = document.getElementById('edit-name-container');
+  const newName = userNameEdit.value.trim();
 
-    if (newName && currentUser) {
+  if (newName) {
+    userNameDisplay.textContent = newName;
+    userNameDisplay.style.display = 'inline-block';
+    editContainer.style.display = 'none';
+
+    localStorage.setItem('custom_display_name', newName);
+
+    if (currentUser) {
       db.collection('users').doc(currentUser.uid).set({
         displayName: newName
-      }, { merge: true }).then(() => {
-        userNameDisplay.textContent = newName;
-        userNameDisplay.style.display = 'inline-block';
-        userNameEdit.style.display = 'none';
-      });
+      }, { merge: true });
     }
+  }
+}
+
+// Cambiar avatar con el explorador de archivos
+function changeAvatar(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const avatarImg = document.getElementById('user-avatar');
+      if (avatarImg) avatarImg.src = e.target.result;
+
+      localStorage.setItem('custom_avatar', e.target.result);
+    };
+    reader.readAsDataURL(file);
   }
 }
 
@@ -214,6 +229,19 @@ document.addEventListener('DOMContentLoaded', function() {
   var logoutBtn = document.getElementById('logout-btn');
   var userNameEdit = document.getElementById('user-name-edit');
 
+  // Cargar perfil guardado localmente
+  const savedAvatar = localStorage.getItem('custom_avatar');
+  if (savedAvatar) {
+    const avatarImg = document.getElementById('user-avatar');
+    if (avatarImg) avatarImg.src = savedAvatar;
+  }
+
+  const savedName = localStorage.getItem('custom_display_name');
+  if (savedName) {
+    const userNameDisplay = document.getElementById('user-name-display');
+    if (userNameDisplay) userNameDisplay.textContent = savedName;
+  }
+
   if (loginBtn) {
     loginBtn.addEventListener('click', function() {
       var provider = new firebase.auth.GoogleAuthProvider();
@@ -230,10 +258,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (userNameEdit) {
-    userNameEdit.addEventListener('keydown', saveCustomName);
+    userNameEdit.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') saveCustomName();
+    });
   }
 
-  // Escuchar estado de autenticación
+  // Escuchar estado de autenticación de Firebase
   auth.onAuthStateChanged(function(user) {
     if (user) {
       currentUser = user;
@@ -244,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function() {
         var userNameDisplay = document.getElementById('user-name-display');
         
         if (doc.exists) {
-          // Favoritos
           if (doc.data().favorites) {
             var cloudFavs = doc.data().favorites;
             favoriteIds = Array.from(new Set(localFavs.concat(cloudFavs)));
@@ -253,17 +282,11 @@ document.addEventListener('DOMContentLoaded', function() {
             favoriteIds = localFavs;
           }
 
-          // Nombre personalizado
           if (doc.data().displayName && userNameDisplay) {
             userNameDisplay.textContent = doc.data().displayName;
-          } else if (user.displayName && userNameDisplay) {
-            userNameDisplay.textContent = user.displayName;
           }
         } else {
           favoriteIds = localFavs;
-          if (userNameDisplay && user.displayName) {
-            userNameDisplay.textContent = user.displayName;
-          }
         }
         applyFilters();
       }).catch(function(err) {
