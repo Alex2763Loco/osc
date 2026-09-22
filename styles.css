@@ -11,6 +11,9 @@
   --btn-hover: #3a3a3a;
   --input-bg: #1e1e1e;
   --border-color: #333333;
+  --sidebar-bg: #18181b;
+  --sidebar-text: #f4f4f5;
+  --sidebar-hover: rgba(255, 255, 255, 0.12);
 }
 
 [data-theme="light"] {
@@ -23,6 +26,9 @@
   --btn-hover: #d0d0d0;
   --input-bg: #ffffff;
   --border-color: #cccccc;
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #121212;
+  --sidebar-hover: rgba(0, 0, 0, 0.08);
 }
 
 /* ==========================================
@@ -288,12 +294,12 @@ header p {
 }
 
 /* ==========================================
-   NUEVO: Botón hamburguesa y Sidebar Derecha
+   Botón hamburguesa y Sidebar Derecha
    ========================================== */
 .sidebar-toggle-btn {
   background: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   font-size: 1.4rem;
   padding: 4px 10px;
   border-radius: 6px;
@@ -302,7 +308,7 @@ header p {
   transition: background 0.2s;
 }
 .sidebar-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--btn-hover);
 }
 
 .sidebar-overlay {
@@ -329,8 +335,8 @@ header p {
   right: -320px;
   width: 300px;
   height: 100%;
-  background: #18181b;
-  color: #f4f4f5;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
   box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
   transition: right 0.3s ease-in-out;
   z-index: 1000;
@@ -346,7 +352,7 @@ header p {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-color);
 }
 .sidebar-header h2 {
   margin: 0;
@@ -355,7 +361,7 @@ header p {
 .sidebar-close-btn {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--sidebar-text);
   font-size: 2rem;
   cursor: pointer;
   line-height: 1;
@@ -370,7 +376,7 @@ header p {
 }
 .sidebar-section h3 {
   font-size: 0.85rem;
-  color: #a1a1aa;
+  color: var(--text-secondary);
   margin-bottom: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -379,9 +385,9 @@ header p {
 .sidebar-option-btn {
   width: 100%;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--btn-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   border-radius: 6px;
   text-align: left;
   cursor: pointer;
@@ -390,7 +396,7 @@ header p {
   transition: background 0.2s;
 }
 .sidebar-option-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--btn-hover);
 }
 
 /* ==========================================
