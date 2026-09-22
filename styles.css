@@ -50,11 +50,6 @@ body {
   width: 200%;
   height: 200%;
   z-index: -1;
-  
-  /* Si deseas agregar una nueva imagen en el futuro,
-     descomenta la siguiente línea y pon la ruta de tu nuevo archivo: */
-  /* background-image: url('tu_nueva_imagen.webp'); */
-  
   background-repeat: repeat;
   background-size: 100px 50px; 
   opacity: 0.7;
@@ -290,6 +285,112 @@ header p {
   grid-column: 1 / -1;
   color: var(--text-secondary);
   font-size: 1.1rem;
+}
+
+/* ==========================================
+   NUEVO: Botón hamburguesa y Sidebar Derecha
+   ========================================== */
+.sidebar-toggle-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.4rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: background 0.2s;
+}
+.sidebar-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  z-index: 999;
+}
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.right-sidebar {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 300px;
+  height: 100%;
+  background: #18181b;
+  color: #f4f4f5;
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+.right-sidebar.active {
+  right: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.sidebar-close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.sidebar-content {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.sidebar-section h3 {
+  font-size: 0.85rem;
+  color: #a1a1aa;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sidebar-option-btn {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  display: block;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+.sidebar-option-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* ==========================================
