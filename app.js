@@ -88,7 +88,7 @@ function saveFavorites(id, starElement) {
   }
 }
 
-// Gestión de Visibilidad del Perfil y Sidebar de Cuenta
+// Gestión de Visibilidad del Perfil
 function setupProfile() {
   const btnLogin = document.getElementById('login-btn');
   const btnLogout = document.getElementById('logout-btn');
@@ -106,17 +106,20 @@ function setupProfile() {
   updateSidebarUserUI();
 }
 
-// Actualizar contenido de la cuenta dentro del Sidebar derecho
+// Actualizar contenido de la cuenta dentro del Sidebar derecho (Sincronizado)
 function updateSidebarUserUI() {
   const container = document.getElementById('sidebar-user-info');
   if (!container) return;
 
+  const currentAvatarSrc = document.getElementById('user-avatar')?.src || 'profile_match.png';
+  const currentDisplayName = document.getElementById('user-name-display')?.textContent || (currentUser ? currentUser.displayName : 'Usuario');
+
   if (currentUser) {
     container.innerHTML = `
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-        <img src="${currentUser.photoURL || 'profile_match.png'}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #00ff66;" />
+        <img src="${currentAvatarSrc}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #00ff66;" />
         <div>
-          <p style="margin: 0; font-weight: bold; font-size: 0.95rem; color: #fff;">${currentUser.displayName || 'Usuario'}</p>
+          <p style="margin: 0; font-weight: bold; font-size: 0.95rem; color: #fff;">${currentDisplayName}</p>
           <p style="margin: 0; font-size: 0.8rem; color: #00ff66;">Conectado con Google</p>
         </div>
       </div>
@@ -145,6 +148,7 @@ function updateSidebarUserUI() {
 
 // Funciones para abrir y cerrar el Sidebar
 function openSidebar() {
+  updateSidebarUserUI(); // Se asegura de refrescar los datos al abrir
   document.getElementById('right-sidebar').classList.add('active');
   document.getElementById('sidebar-overlay').classList.add('active');
 }
@@ -187,6 +191,7 @@ function saveCustomName() {
         displayName: newName
       }, { merge: true });
     }
+    updateSidebarUserUI();
   }
 }
 
@@ -200,6 +205,7 @@ function changeAvatar(event) {
       if (avatarImg) avatarImg.src = e.target.result;
 
       localStorage.setItem('custom_avatar', e.target.result);
+      updateSidebarUserUI();
     };
     reader.readAsDataURL(file);
   }
@@ -351,6 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
           if (doc.data().displayName && userNameDisplay) {
             userNameDisplay.textContent = doc.data().displayName;
+            localStorage.setItem('custom_display_name', doc.data().displayName);
           }
         } else {
           favoriteIds = localFavs;
