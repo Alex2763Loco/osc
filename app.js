@@ -88,7 +88,7 @@ function saveFavorites(id, starElement) {
   }
 }
 
-// Gestión de Visibilidad del Perfil
+// Gestión de Visibilidad del Perfil y Sidebar de Cuenta
 function setupProfile() {
   const btnLogin = document.getElementById('login-btn');
   const btnLogout = document.getElementById('logout-btn');
@@ -101,8 +101,57 @@ function setupProfile() {
   } else {
     if (btnLogin) btnLogin.style.display = 'inline-block';
     if (btnLogout) btnLogout.style.display = 'none';
-    if (userProfile) userProfile.style.display = 'flex'; // Mantener visible perfil local
+    if (userProfile) userProfile.style.display = 'flex';
   }
+  updateSidebarUserUI();
+}
+
+// Actualizar contenido de la cuenta dentro del Sidebar derecho
+function updateSidebarUserUI() {
+  const container = document.getElementById('sidebar-user-info');
+  if (!container) return;
+
+  if (currentUser) {
+    container.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+        <img src="${currentUser.photoURL || 'profile_match.png'}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #00ff66;" />
+        <div>
+          <p style="margin: 0; font-weight: bold; font-size: 0.95rem; color: #fff;">${currentUser.displayName || 'Usuario'}</p>
+          <p style="margin: 0; font-size: 0.8rem; color: #00ff66;">Conectado con Google</p>
+        </div>
+      </div>
+      <button id="sidebar-logout-btn" class="sidebar-option-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); text-align: center;">Cerrar Sesión</button>
+    `;
+
+    document.getElementById('sidebar-logout-btn').addEventListener('click', function() {
+      auth.signOut();
+      closeSidebar();
+    });
+  } else {
+    container.innerHTML = `
+      <p style="font-size: 0.9rem; color: #a1a1aa; margin-bottom: 12px;">No has iniciado sesión con cuenta.</p>
+      <button id="sidebar-login-btn" class="sidebar-option-btn" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); text-align: center;">🔑 Acceder / Crear cuenta</button>
+    `;
+
+    document.getElementById('sidebar-login-btn').addEventListener('click', function() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(function(error) {
+        console.error("Error al iniciar sesión:", error);
+      });
+      closeSidebar();
+    });
+  }
+}
+
+// Funciones para abrir y cerrar el Sidebar
+function openSidebar() {
+  document.getElementById('right-sidebar').classList.add('active');
+  document.getElementById('sidebar-overlay').classList.add('active');
+}
+
+function closeSidebar() {
+  document.getElementById('right-sidebar').classList.remove('active');
+  document.getElementById('sidebar-overlay').classList.remove('active');
 }
 
 // Mostrar campo para editar nombre
@@ -119,7 +168,7 @@ function toggleNameEdit() {
   }
 }
 
-// Guardar nuevo nombre (al presionar el botón o Enter)
+// Guardar nuevo nombre
 function saveCustomName() {
   const userNameEdit = document.getElementById('user-name-edit');
   const userNameDisplay = document.getElementById('user-name-display');
@@ -141,7 +190,7 @@ function saveCustomName() {
   }
 }
 
-// Cambiar avatar con el explorador de archivos
+// Cambiar avatar con explorador de archivos
 function changeAvatar(event) {
   const file = event.target.files[0];
   if (file) {
@@ -229,6 +278,24 @@ document.addEventListener('DOMContentLoaded', function() {
   var logoutBtn = document.getElementById('logout-btn');
   var userNameEdit = document.getElementById('user-name-edit');
 
+  // Controles del Sidebar
+  var toggleBtn = document.getElementById('sidebar-toggle-btn');
+  var closeBtn = document.getElementById('sidebar-close-btn');
+  var overlay = document.getElementById('sidebar-overlay');
+  var sidebarThemeToggle = document.getElementById('sidebar-theme-toggle');
+
+  if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+  if (overlay) overlay.addEventListener('click', closeSidebar);
+
+  // Sincronizar botón de tema dentro del sidebar
+  if (sidebarThemeToggle) {
+    sidebarThemeToggle.addEventListener('click', function() {
+      var themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) themeToggle.click();
+    });
+  }
+
   // Cargar perfil guardado localmente
   const savedAvatar = localStorage.getItem('custom_avatar');
   if (savedAvatar) {
@@ -289,10 +356,12 @@ document.addEventListener('DOMContentLoaded', function() {
           favoriteIds = localFavs;
         }
         applyFilters();
+        updateSidebarUserUI();
       }).catch(function(err) {
         console.error("Error leyendo Firestore:", err);
         loadLocalFavorites();
         applyFilters();
+        updateSidebarUserUI();
       });
 
     } else {
@@ -300,6 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
       setupProfile();
       loadLocalFavorites();
       applyFilters();
+      updateSidebarUserUI();
     }
   });
 
