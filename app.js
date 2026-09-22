@@ -88,41 +88,33 @@ function saveFavorites(id, starElement) {
   }
 }
 
-// Gestión de Visibilidad del Perfil
+// La info de cuenta ya no vive en la navbar, así que solo
+// necesitamos mantener sincronizado el sidebar.
 function setupProfile() {
-  const btnLogin = document.getElementById('login-btn');
-  const btnLogout = document.getElementById('logout-btn');
-  const userProfile = document.getElementById('user-profile');
-
-  if (currentUser) {
-    if (btnLogin) btnLogin.style.display = 'none';
-    if (btnLogout) btnLogout.style.display = 'inline-block';
-    if (userProfile) userProfile.style.display = 'flex';
-  } else {
-    if (btnLogin) btnLogin.style.display = 'inline-block';
-    if (btnLogout) btnLogout.style.display = 'none';
-    // FIX: antes esto también ponía 'flex', por eso el avatar/nombre
-    // aparecían en la navbar aunque NO hubiera sesión iniciada.
-    if (userProfile) userProfile.style.display = 'none';
-  }
   updateSidebarUserUI();
 }
 
-// Actualizar contenido de la cuenta dentro del Sidebar derecho (Sincronizado)
+// Genera todo el bloque de cuenta (avatar, nombre, login/logout)
+// dentro del Sidebar derecho.
 function updateSidebarUserUI() {
   const container = document.getElementById('sidebar-user-info');
   if (!container) return;
 
-  const currentAvatarSrc = document.getElementById('user-avatar')?.src || 'profile_match.png';
-  const currentDisplayName = document.getElementById('user-name-display')?.textContent || (currentUser ? currentUser.displayName : 'Usuario');
+  const currentAvatarSrc = localStorage.getItem('custom_avatar') || 'profile_match.png';
+  const currentDisplayName = localStorage.getItem('custom_display_name') || (currentUser ? currentUser.displayName : 'Usuario');
 
   if (currentUser) {
     container.innerHTML = `
+      <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="changeAvatar(event)">
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-        <img src="${currentAvatarSrc}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #00ff66;" />
+        <img id="user-avatar" src="${currentAvatarSrc}" onclick="document.getElementById('avatar-input').click()" title="Haz clic para cambiar foto" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #00ff66; cursor: pointer; flex-shrink: 0;" />
         <div>
-          <p style="margin: 0; font-weight: bold; font-size: 0.95rem; color: #fff;">${currentDisplayName}</p>
-          <p style="margin: 0; font-size: 0.8rem; color: #00ff66;">Conectado con Google</p>
+          <span id="user-name-display" onclick="toggleNameEdit()" style="cursor: pointer; font-weight: bold; font-size: 0.95rem; color: #fff;" title="Haz clic para cambiar nombre">${currentDisplayName}</span>
+          <div id="edit-name-container" style="display: none; align-items: center; gap: 4px; margin-top: 4px;">
+            <input type="text" id="user-name-edit" style="background: #222; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px; padding: 2px 6px; font-size: 13px;">
+            <button onclick="saveCustomName()" class="theme-btn" style="padding: 2px 8px; font-size: 11px; cursor: pointer;">Guardar</button>
+          </div>
+          <p style="margin: 2px 0 0; font-size: 0.8rem; color: #00ff66;">Conectado con Google</p>
         </div>
       </div>
       <button id="sidebar-logout-btn" class="sidebar-option-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); text-align: center;">Cerrar Sesión</button>
@@ -132,6 +124,13 @@ function updateSidebarUserUI() {
       auth.signOut();
       closeSidebar();
     });
+
+    var nameEditInput = document.getElementById('user-name-edit');
+    if (nameEditInput) {
+      nameEditInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') saveCustomName();
+      });
+    }
   } else {
     container.innerHTML = `
       <p style="font-size: 0.9rem; color: #a1a1aa; margin-bottom: 12px;">No has iniciado sesión con cuenta.</p>
@@ -160,7 +159,7 @@ function closeSidebar() {
   document.getElementById('sidebar-overlay').classList.remove('active');
 }
 
-// Mostrar campo para editar nombre
+// Mostrar campo para editar nombre (ahora dentro del sidebar)
 function toggleNameEdit() {
   const userNameDisplay = document.getElementById('user-name-display');
   const editContainer = document.getElementById('edit-name-container');
@@ -177,15 +176,11 @@ function toggleNameEdit() {
 // Guardar nuevo nombre
 function saveCustomName() {
   const userNameEdit = document.getElementById('user-name-edit');
-  const userNameDisplay = document.getElementById('user-name-display');
-  const editContainer = document.getElementById('edit-name-container');
+  if (!userNameEdit) return;
+
   const newName = userNameEdit.value.trim();
 
   if (newName) {
-    userNameDisplay.textContent = newName;
-    userNameDisplay.style.display = 'inline-block';
-    editContainer.style.display = 'none';
-
     localStorage.setItem('custom_display_name', newName);
 
     if (currentUser) {
@@ -193,19 +188,18 @@ function saveCustomName() {
         displayName: newName
       }, { merge: true });
     }
-    updateSidebarUserUI();
   }
+
+  // Vuelve a pintar el bloque de cuenta con el nombre actualizado (o el anterior si se dejó vacío)
+  updateSidebarUserUI();
 }
 
-// Cambiar avatar con explorador de archivos
+// Cambiar avatar con explorador de archivos (ahora abierto desde el sidebar)
 function changeAvatar(event) {
   const file = event.target.files[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      const avatarImg = document.getElementById('user-avatar');
-      if (avatarImg) avatarImg.src = e.target.result;
-
       localStorage.setItem('custom_avatar', e.target.result);
       updateSidebarUserUI();
     };
@@ -282,10 +276,6 @@ function renderEpisodes(episodesToRender) {
 document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('click', initAudio, { once: true });
 
-  var loginBtn = document.getElementById('login-btn');
-  var logoutBtn = document.getElementById('logout-btn');
-  var userNameEdit = document.getElementById('user-name-edit');
-
   // Controles del Sidebar
   var toggleBtn = document.getElementById('sidebar-toggle-btn');
   var closeBtn = document.getElementById('sidebar-close-btn');
@@ -304,40 +294,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Cargar perfil guardado localmente
-  const savedAvatar = localStorage.getItem('custom_avatar');
-  if (savedAvatar) {
-    const avatarImg = document.getElementById('user-avatar');
-    if (avatarImg) avatarImg.src = savedAvatar;
-  }
-
-  const savedName = localStorage.getItem('custom_display_name');
-  if (savedName) {
-    const userNameDisplay = document.getElementById('user-name-display');
-    if (userNameDisplay) userNameDisplay.textContent = savedName;
-  }
-
-  if (loginBtn) {
-    loginBtn.addEventListener('click', function() {
-      var provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(function(error) {
-        console.error("Error al iniciar sesión:", error);
-      });
-    });
-  }
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', function() {
-      auth.signOut();
-    });
-  }
-
-  if (userNameEdit) {
-    userNameEdit.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') saveCustomName();
-    });
-  }
-
   // Escuchar estado de autenticación de Firebase
   auth.onAuthStateChanged(function(user) {
     if (user) {
@@ -346,8 +302,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
       var localFavs = JSON.parse(localStorage.getItem('osc_favs') || '[]');
       db.collection('users').doc(user.uid).get().then(function(doc) {
-        var userNameDisplay = document.getElementById('user-name-display');
-        
         if (doc.exists) {
           if (doc.data().favorites) {
             var cloudFavs = doc.data().favorites;
@@ -357,8 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
             favoriteIds = localFavs;
           }
 
-          if (doc.data().displayName && userNameDisplay) {
-            userNameDisplay.textContent = doc.data().displayName;
+          if (doc.data().displayName) {
             localStorage.setItem('custom_display_name', doc.data().displayName);
           }
         } else {
