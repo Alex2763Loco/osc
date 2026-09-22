@@ -23,6 +23,7 @@ var searchQuery = '';
 var favoriteIds = [];
 var currentUser = null;
 var audioCtx = null;
+var hoverVolume = 0.15;
 
 // Sistema de Audio
 function initAudio() {
@@ -45,8 +46,8 @@ function playGuiHoverSound() {
     osc.frequency.setValueAtTime(350, audioCtx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.05);
 
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    gain.gain.setValueAtTime(hoverVolume, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
@@ -281,10 +282,19 @@ document.addEventListener('DOMContentLoaded', function() {
   var closeBtn = document.getElementById('sidebar-close-btn');
   var overlay = document.getElementById('sidebar-overlay');
   var sidebarThemeToggle = document.getElementById('sidebar-theme-toggle');
+  var volumeSlider = document.getElementById('volume-slider');
 
   if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
   if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
   if (overlay) overlay.addEventListener('click', closeSidebar);
+
+  // Control de volumen del sonido de hover
+  if (volumeSlider) {
+    hoverVolume = parseFloat(volumeSlider.value); // toma el valor inicial del HTML (0.15)
+    volumeSlider.addEventListener('input', function(e) {
+      hoverVolume = parseFloat(e.target.value);
+    });
+  }
 
   // Sincronizar botón de tema dentro del sidebar
   if (sidebarThemeToggle) {
