@@ -45,9 +45,53 @@
       </div>
 
       <button id="logout-btn" class="theme-btn" style="display: none;">Cerrar sesión</button>
+
+      <!-- Botón para abrir la barra lateral derecha -->
+      <button id="sidebar-toggle-btn" class="sidebar-toggle-btn" title="Abrir menú">☰</button>
     </div>
     <p>¡El archivo definitivo de BFDI, II, ONE Y más!</p>
   </header>
+
+  <!-- Fondo oscuro translúcido para el menú lateral -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Barra Lateral Derecha -->
+  <aside id="right-sidebar" class="right-sidebar">
+    <div class="sidebar-header">
+      <h2>Menú</h2>
+      <button id="sidebar-close-btn" class="sidebar-close-btn">&times;</button>
+    </div>
+
+    <div class="sidebar-content">
+      <!-- Sección de Cuenta / Usuario dentro del Sidebar -->
+      <div class="sidebar-section">
+        <h3>Cuenta</h3>
+        <div id="sidebar-user-info" class="sidebar-user-info">
+          <!-- Se rellena dinámicamente desde JS -->
+        </div>
+      </div>
+
+      <!-- Sección de Configuraciones -->
+      <div class="sidebar-section">
+        <h3>Configuración</h3>
+        <button id="sidebar-theme-toggle" class="sidebar-option-btn">
+          ☀️ Cambiar Tema (Claro/Oscuro)
+        </button>
+        
+        <!-- Control de Volumen -->
+        <div class="sidebar-volume-control" style="margin-top: 10px;">
+          <label for="volume-slider" style="display: block; margin-bottom: 5px;">🔊 Volumen de Interfaz:</label>
+          <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.15" style="width: 100%; cursor: pointer;">
+        </div>
+      </div>
+
+      <!-- Más opciones -->
+      <div class="sidebar-section">
+        <h3>Más opciones</h3>
+        <button class="sidebar-option-btn" onclick="currentFilter='favs'; applyFilters(); closeSidebar();">⭐ Ver Favoritos</button>
+      </div>
+    </div>
+  </aside>
 
   <div class="controls-container">
     <div class="search-box">
