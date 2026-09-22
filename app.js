@@ -25,6 +25,13 @@ var currentUser = null;
 var audioCtx = null;
 var hoverVolume = 0.15;
 
+// --- Control de volumen para los videos de YouTube ---
+var ytPlayers = [];        // reproductores YT.Player activos
+var videoVolume = 100;     // 0-100, escala nativa de la API de YouTube
+var ytApiReady = false;    // true cuando el script de la API terminó de cargar
+var ytApiLoading = false;
+var playerIdCounter = 0;   // para dar un id único a cada iframe
+
 // Sistema de Audio
 function initAudio() {
   if (!audioCtx) {
@@ -57,6 +64,43 @@ function playGuiHoverSound() {
   } catch (e) {
     console.error(e);
   }
+}
+
+// Carga el script oficial de la API de YouTube (una sola vez)
+function loadYouTubeAPI() {
+  if (ytApiLoading || (window.YT && window.YT.Player)) return;
+  ytApiLoading = true;
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
+
+// La API llama a esta función global automáticamente cuando termina de cargar
+window.onYouTubeIframeAPIReady = function() {
+  ytApiReady = true;
+  attachPlayersToExistingIframes();
+};
+
+// Conecta un YT.Player a cada iframe de video que ya esté en la página
+function attachPlayersToExistingIframes() {
+  if (!ytApiReady) return;
+  document.querySelectorAll('iframe.yt-embed').forEach(function(iframe) {
+    createPlayerForIframe(iframe);
+  });
+}
+
+// Crea un reproductor controlable para un iframe específico
+function createPlayerForIframe(iframe) {
+  if (!ytApiReady || !window.YT || !window.YT.Player) return;
+  new YT.Player(iframe.id, {
+    events: {
+      onReady: function(event) {
+        event.target.setVolume(videoVolume);
+        ytPlayers.push(event.target);
+      }
+    }
+  });
 }
 
 // Favoritos (Local o Nube)
@@ -236,6 +280,7 @@ function renderEpisodes(episodesToRender) {
   if (!episodesContainer) return;
 
   episodesContainer.innerHTML = '';
+  ytPlayers = []; // los iframes viejos se destruyeron, así que sus reproductores ya no sirven
 
   if (episodesToRender.length === 0) {
     var emptyMessage = currentFilter === 'favs' 
@@ -260,8 +305,11 @@ function renderEpisodes(episodesToRender) {
         '<button class="' + starClass + '" data-id="' + ep.youtubeId + '" title="Guardar en favoritos">' + starIcon + '</button>' +
       '</div>';
 
+    var iframeId = 'yt-player-' + (playerIdCounter++);
+    var origin = encodeURIComponent(window.location.origin);
+
     card.innerHTML = headerHTML +
-      '<iframe src="https://www.youtube.com/embed/' + ep.youtubeId + '" title="' + ep.title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+      '<iframe id="' + iframeId + '" class="yt-embed" src="https://www.youtube.com/embed/' + ep.youtubeId + '?enablejsapi=1&origin=' + origin + '" title="' + ep.title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
 
     var starBtn = card.querySelector('.star-btn');
     starBtn.addEventListener('click', function(e) {
@@ -270,6 +318,14 @@ function renderEpisodes(episodesToRender) {
     });
 
     episodesContainer.appendChild(card);
+
+    // Conecta este video al control de volumen global
+    var iframeEl = card.querySelector('iframe');
+    if (ytApiReady) {
+      createPlayerForIframe(iframeEl);
+    }
+    // Si la API todavía no cargó, no pasa nada: cuando esté lista,
+    // onYouTubeIframeAPIReady conectará automáticamente todos los iframes presentes.
   });
 }
 
@@ -288,13 +344,28 @@ document.addEventListener('DOMContentLoaded', function() {
   if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
   if (overlay) overlay.addEventListener('click', closeSidebar);
 
-  // Control de volumen del sonido de hover
+  // Control de volumen: mueve tanto el sonido de la interfaz como el de los videos
   if (volumeSlider) {
-    hoverVolume = parseFloat(volumeSlider.value); // toma el valor inicial del HTML (0.15)
+    hoverVolume = parseFloat(volumeSlider.value); // 0 a 1, para el sonido de hover
+    videoVolume = Math.round(hoverVolume * 100);  // 0 a 100, escala que usa YouTube
+
     volumeSlider.addEventListener('input', function(e) {
       hoverVolume = parseFloat(e.target.value);
+      videoVolume = Math.round(hoverVolume * 100);
+
+      ytPlayers.forEach(function(player) {
+        try {
+          player.setVolume(videoVolume);
+        } catch (err) {
+          // el reproductor pudo haber sido destruido al cambiar de filtro; se ignora
+        }
+      });
     });
   }
+
+  // Empieza a cargar la API de YouTube desde ya, para que esté lista
+  // cuando se pinten las primeras tarjetas de video
+  loadYouTubeAPI();
 
   // Sincronizar botón de tema dentro del sidebar
   if (sidebarThemeToggle) {
