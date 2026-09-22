@@ -101,7 +101,9 @@ function setupProfile() {
   } else {
     if (btnLogin) btnLogin.style.display = 'inline-block';
     if (btnLogout) btnLogout.style.display = 'none';
-    if (userProfile) userProfile.style.display = 'flex';
+    // FIX: antes esto también ponía 'flex', por eso el avatar/nombre
+    // aparecían en la navbar aunque NO hubiera sesión iniciada.
+    if (userProfile) userProfile.style.display = 'none';
   }
   updateSidebarUserUI();
 }
